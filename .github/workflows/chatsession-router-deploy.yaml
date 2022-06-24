@@ -20,10 +20,7 @@ env:
 jobs:
   build:
     uses: ./chatsession-router-build.yaml,
-    secrets: 
-      PROJECT_ID: ${{ secrets.PROJECT_ID }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_APIKEY }}
+    secrets: inherit
 
   build-container:
       runs-on: ubuntu-latest
