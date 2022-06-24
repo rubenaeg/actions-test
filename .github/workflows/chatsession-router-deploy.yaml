@@ -19,7 +19,7 @@ env:
 
 jobs:
   build:
-    uses: ./chatsession-router-build.yaml,
+    uses: ./chatsession-router-build.yaml@main,
     secrets: inherit
 
   build-container:
