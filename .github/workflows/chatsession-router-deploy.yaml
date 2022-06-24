@@ -1,0 +1,78 @@
+# Copyright 2020 Google, LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: "[CORE] Chatsession Router Deploy"
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+    - Chatsession Router Build
+    types:
+    - completed
+
+env:
+  PROJECT_ID: ${{ secrets.CORE_PROJECT_ID }}
+  IMAGE_NAME: "chatsession-router"
+  GKE_INSTANCE_ZONE: "europe-west3"
+  DEPLOYMENT: "chatsession-router"
+
+jobs:
+  deploy-appweb-dev:
+    name: Deploy - AppWeb Dev
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+    # Setup gcloud CLI uses: google-github-actions/setup-gcloud@v0
+    # Causing errors since a 5.8.2021 GoogleCloudPlatform/github-actions/setup-gcloud@v0
+    - uses: google-github-actions/setup-gcloud@v0
+      with:
+        service_account_key: ${{ secrets.CORE_SA_KEY }}
+        project_id: ${{ secrets.CORE_PROJECT_ID }}
+
+    - name: Deploy
+      uses: ameydev/gke-kubectl-action@master
+      env:
+        PROJECT_ID: ${{ secrets.CORE_PROJECT_ID }}
+        APPLICATION_CREDENTIALS: ${{ secrets.CD_SA_KEY }}
+        CLUSTER_NAME: ${{ secrets.CORE_GKE_CLUSTER_NAME }}
+        ZONE_NAME: ${{ env.GKE_INSTANCE_ZONE }}
+        GKE_NAMESPACE: "botify-team-core"
+      with:
+        args: rollout restart deployment ${{ env.DEPLOYMENT }}  -n ${{ env.GKE_NAMESPACE }}
+
+  deploy-sales-dev:
+    name: Deploy - Sales Dev
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+    # Setup gcloud CLI uses: google-github-actions/setup-gcloud@v0
+    # Causing errors since a 5.8.2021 GoogleCloudPlatform/github-actions/setup-gcloud@v0
+    - uses: google-github-actions/setup-gcloud@v0
+      with:
+        service_account_key: ${{ secrets.CORE_SA_KEY }}
+        project_id: ${{ secrets.CORE_PROJECT_ID }}
+
+    - name: Deploy
+      uses: ameydev/gke-kubectl-action@master
+      env:
+        PROJECT_ID: ${{ secrets.CORE_PROJECT_ID }}
+        APPLICATION_CREDENTIALS: ${{ secrets.CD_SA_KEY }}
+        CLUSTER_NAME: ${{ secrets.CORE_GKE_CLUSTER_NAME }}
+        ZONE_NAME: ${{ env.GKE_INSTANCE_ZONE }}
+        GKE_NAMESPACE: "botify-sales-dev"
+      with:
+        args: rollout restart deployment ${{ env.DEPLOYMENT }}  -n ${{ env.GKE_NAMESPACE }}
