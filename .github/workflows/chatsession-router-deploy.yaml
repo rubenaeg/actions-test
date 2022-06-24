@@ -2,9 +2,7 @@ name: "[APP-WEB] Build Test Deploy"
 on:
   push:
     branches:
-      - development
-    paths:
-      - 'chatbots/team/botify-team-bot/**'
+      - master
   workflow_dispatch:
 
 env:

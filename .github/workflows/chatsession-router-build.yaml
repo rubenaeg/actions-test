@@ -2,9 +2,7 @@ name: "[APP-WEB] Build Test"
 on:
   pull_request:
     branches:
-      - development
-    paths:
-      - 'chatbots/team/botify-team-bot/**'
+      - master
   workflow_call:
     secrets: inherit
   workflow_dispatch:
